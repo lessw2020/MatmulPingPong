@@ -108,6 +108,66 @@ uint64_t gmem_prob_shape[5] = {(uint64_t) shape_minor, (uint64_t)shape_major, 1,
 uint64)t gmem_prob_stride[5] = {sizeof(DType), sizeof(DType) * shape_minor, 0, 0,0};
 
 
+  assert((reinterpret_cast<uint64_t>(gmem_address) & 0b1111) == 0);
+  assert(gmem_prob_shape[0] >= (uint64_t(1)));
+  assert(gmem_prob_shape[0] <= (uint64_t(1) << 32));
+  assert(gmem_prob_shape[1] >= (uint64_t(1)));
+  assert(gmem_prob_shape[1] <= (uint64_t(1) << 32));
+  assert(gmem_prob_shape[2] >= (uint64_t(1)));
+  assert(gmem_prob_shape[2] <= (uint64_t(1) << 32));
+  assert(gmem_prob_shape[3] >= (uint64_t(1)));
+  assert(gmem_prob_shape[3] <= (uint64_t(1) << 32));
+  assert(gmem_prob_shape[4] >= (uint64_t(1)));
+  assert(gmem_prob_shape[4] <= (uint64_t(1) << 32));
+
+  assert(gmem_prob_stride[0] == sizeof(DType));
+  assert(gmem_prob_stride[1] < (uint64_t(1) << 40));
+  assert((gmem_prob_stride[1] & 0b1111) == 0);
+  assert(gmem_prob_stride[2] < (uint64_t(1) << 40));
+  assert((gmem_prob_stride[2] & 0b1111) == 0);
+  assert(gmem_prob_stride[3] < (uint64_t(1) << 40));
+  assert((gmem_prob_stride[3] & 0b1111) == 0);
+  assert(gmem_prob_stride[4] < (uint64_t(1) << 40));
+  assert((gmem_prob_stride[4] & 0b1111) == 0);
+
+  assert(BlockMajorSize % num_multicast == 0);
+
+  uint32_t smem_box_shape[5] = {uint32_t(BlockMinorSize),
+                                uint32_t(BlockMajorSize / num_multicast), 1,1,1};
+    uint32_t smem_box_stride[5] = {1,1,1,1,1};
+
+
+  assert(smem_box_shape[0] >= (uint32_t(1)));  // Size must be min 1
+  assert(smem_box_shape[0] <=
+         (uint32_t(1) << 8));                  // Size must be max 2^8 = 256
+  assert(smem_box_shape[1] >= (uint32_t(1)));  // Size must be min 1
+  assert(smem_box_shape[1] <=
+         (uint32_t(1) << 8));                  // Size must be max 2^8 = 256
+  assert(smem_box_shape[2] >= (uint32_t(1)));  // Size must be min 1
+  assert(smem_box_shape[2] <=
+         (uint32_t(1) << 8));                  // Size must be max 2^8 = 256
+  assert(smem_box_shape[3] >= (uint32_t(1)));  // Size must be min 1
+  assert(smem_box_shape[3] <=
+         (uint32_t(1) << 8));                  // Size must be max 2^8 = 256
+  assert(smem_box_shape[4] >= (uint32_t(1)));  // Size must be min 1
+  assert(smem_box_shape[4] <=
+         (uint32_t(1) << 8));  // Size must be max 2^8 = 256
+
+  assert(smem_box_stride[0] >= (uint32_t(1)));  // Stride must be min 1
+  assert(smem_box_stride[0] <= (uint32_t(8)));  // Stride must be max 2^3 = 8
+  assert(smem_box_stride[1] >= (uint32_t(1)));  // Stride must be min 1
+  assert(smem_box_stride[1] <= (uint32_t(8)));  // Stride must be max 2^3 = 8
+  assert(smem_box_stride[2] >= (uint32_t(1)));  // Stride must be min 1
+  assert(smem_box_stride[2] <= (uint32_t(8)));  // Stride must be max 2^3 = 8
+  assert(smem_box_stride[3] >= (uint32_t(1)));  // Stride must be min 1
+  assert(smem_box_stride[3] <= (uint32_t(8)));  // Stride must be max 2^3 = 8
+  assert(smem_box_stride[4] >= (uint32_t(1)));  // Stride must be min 1
+  assert(smem_box_stride[4] <= (uint32_t(8)));  // Stride must be max 2^3 = 8
+
+
+
+
+                                }
 
 
 }
