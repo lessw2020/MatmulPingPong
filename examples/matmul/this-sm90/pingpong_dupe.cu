@@ -164,7 +164,32 @@ uint64)t gmem_prob_stride[5] = {sizeof(DType), sizeof(DType) * shape_minor, 0, 0
   assert(smem_box_stride[4] >= (uint32_t(1)));  // Stride must be min 1
   assert(smem_box_stride[4] <= (uint32_t(8)));  // Stride must be max 2^3 = 8
 
+TmaDescriptor tma_desc = {0};
+CUtensorMapDataType tma_format = to_CUtensorMapDataType<typename std::remove_cv<DType>::type>();
+CUtensorMapInterleave tma_interleave = CU_TENSOR_MAP_INTERLEAVE_NONE;
+CUtensorMapL2promotion tma_l2Promotion = CU_TENSOR_MAP_L2_PROMOTION_L2_128B;
+CUtensorMapFloatOOBfill tma_oobFill = CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE;
 
+CUtensorMapSwizzle smem_swizzle = to_CUtensorMapSwizzle(get_tma_swizzle_bits(swizzle));
+CUresult result = cuTensorMapEncodeTiled(&tma_desc, tma_format, TmaDim, gmem_address, gmem_prob_shape,
+gmem_prob_stride+1, smem_box_shape, smem_box_stride, tma_interleav,
+smem_swizzle, tma_l2Promotion, tma_oobFill);
+
+if (result != CUDA_SUCCESS) {
+    std::cerr << "TMA Desc Addr:   " << &tma_desc << "\nformat         "
+              << tma_format << "\ndim            " << TmaDim
+              << "\ngmem_address   " << gmem_address << "\nglobalDim      "
+              << gmem_prob_shape << "\nglobalStrides  " << gmem_prob_stride
+              << "\nboxDim         " << smem_box_shape << "\nelementStrides "
+              << smem_box_stride << "\ninterleave     " << tma_interleave
+              << "\nswizzle        " << smem_swizzle << "\nl2Promotion    "
+              << tma_l2Promotion << "\noobFill        " << tma_oobFill
+              << std::endl;
+    std::cerr << "Error: Failed to initialize the TMA descriptor " << result
+              << std::endl;
+    assert(false);
+  }
+    return tma_desc;
 
 
                                 }
